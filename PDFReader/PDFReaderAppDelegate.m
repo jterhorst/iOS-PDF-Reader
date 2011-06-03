@@ -37,11 +37,19 @@
         BOOL theResult = [[NSFileManager defaultManager] moveItemAtURL:url toURL:theDestinationURL error:&theError];
         if (theResult == YES)
             {
-            NSDictionary *theUserInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                sourceApplication, @"sourceApplication",
-                annotation, @"annotation",
-                theDestinationURL, @"URL",
-                NULL];
+            NSMutableDictionary *theUserInfo = [NSMutableDictionary dictionary];
+            if (theDestinationURL != NULL)
+                {
+                [theUserInfo setObject:theDestinationURL forKey:@"URL"];
+                }
+            if (sourceApplication != NULL)
+                {
+                [theUserInfo setObject:sourceApplication forKey:@"sourceApplication"];
+                }
+            if (annotation != NULL)
+                {
+                [theUserInfo setObject:annotation forKey:@"annotation"];
+                }
             [[NSNotificationCenter defaultCenter] postNotificationName:@"applicationDidOpenURL" object:application userInfo:theUserInfo];
             }
         
