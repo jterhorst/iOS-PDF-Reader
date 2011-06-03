@@ -10,19 +10,21 @@
 
 #import <objc/runtime.h>
 
+#import "CPersistentCache.h"
+
 @implementation CPDFDocument (CPDFDocument_Private)
 
-- (NSCache *)cache
+- (CPersistentCache *)cache
     {
     const void *theCacheKey = "cache";
-    NSCache *theCache = objc_getAssociatedObject(self, theCacheKey);
+    CPersistentCache *theCache = objc_getAssociatedObject(self, theCacheKey);
     if (theCache == NULL)
         {
-        theCache = [[[NSCache alloc] init] autorelease];
+        NSString *theCacheName = [[self.URL lastPathComponent] stringByDeletingPathExtension];
+        theCache = [[[CPersistentCache alloc] initWithName:theCacheName] autorelease];
         objc_setAssociatedObject(self, theCacheKey, theCache, OBJC_ASSOCIATION_RETAIN);
         }
     return(theCache);
-    
     }
 
 @end

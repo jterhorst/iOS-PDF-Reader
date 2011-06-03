@@ -8,9 +8,11 @@
 
 #import "CPDFDocument.h"
 
+@class CPersistentCache;
+
 @interface CPDFDocument (CPDFDocument_Private)
 
-@property (readonly, nonatomic, retain) NSCache *cache;
+@property (readonly, nonatomic, retain) CPersistentCache *cache;
 
 
 @end

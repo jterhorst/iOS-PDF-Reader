@@ -79,11 +79,9 @@
 
 - (void)startGeneratingThumbnails
     {
-//    self.thumbnailCache = [[[NSCache alloc] init] autorelease];
-
     const size_t theNumberOfPages = CGPDFDocumentGetNumberOfPages(self.cg);
 
-    queue = dispatch_queue_create("com.example.MyQueue", NULL);
+    self.queue = dispatch_queue_create("com.example.MyQueue", NULL);
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^(void) {
 
@@ -93,10 +91,11 @@
             
             CPDFPage *thePage = [self pageForPageNumber:thePageNumber];
 
-            if ([self.cache objectForKey:[NSNumber numberWithInteger:thePageNumber]] == NULL)
+            NSString *theKey = [NSString stringWithFormat:@"page_%d_image_128x128", thePageNumber];
+            if ([self.cache objectForKey:theKey] == NULL)
                 {
                 UIImage *theImage = [thePage imageWithSize:(CGSize){ 128, 128 }];
-                [self.cache setObject:theImage forKey:[NSNumber numberWithInteger:thePageNumber]];
+                [self.cache setObject:theImage forKey:theKey];
                 }
 
             dispatch_async(dispatch_get_main_queue(), ^(void) {

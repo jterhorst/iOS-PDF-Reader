@@ -119,7 +119,8 @@
 
 - (UIImage *)thumbnail
     {
-    UIImage *theImage = [self.document.cache objectForKey:[NSNumber numberWithInteger:self.pageNumber]];
+    NSString *theKey = [NSString stringWithFormat:@"page_%d_image_128x128", self.pageNumber];
+    UIImage *theImage = [self.document.cache objectForKey:theKey];
     return(theImage);
     }
 
