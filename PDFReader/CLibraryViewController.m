@@ -234,8 +234,14 @@
     
     NSURL *theURL = [[inNotification userInfo] objectForKey:@"URL"];
     CPDFDocumentViewController *theViewController = [[[CPDFDocumentViewController alloc] initWithURL:theURL] autorelease];
-    [self.navigationController pushViewController:theViewController animated:YES];
-    
+    if (self.navigationController.topViewController == self)
+        {
+        [self.navigationController pushViewController:theViewController animated:YES];
+        }
+    else
+        {
+        [self.navigationController setViewControllers:[NSArray arrayWithObjects:self, theViewController, NULL] animated:YES];
+        }
     }
 
 @end
