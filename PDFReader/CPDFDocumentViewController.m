@@ -48,6 +48,7 @@
 
 - (void)dealloc
     {
+    document.delegate = NULL;
     [document release];
     [pagingView release];
     [pagePlaceholderView release];

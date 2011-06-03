@@ -54,6 +54,7 @@
     [previousView release];
     [currentView release];
     [nextView release];
+    scrollView.delegate = NULL;
     [scrollView release];
     //
     [super dealloc];
