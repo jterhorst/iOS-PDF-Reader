@@ -10,6 +10,7 @@
 
 #import "CPDFDocument.h"
 #import "CPDFDocument_Private.h"
+#import "Geometry.h"
 
 @interface CPDFPage ()
 @property (readwrite, nonatomic, assign) CPDFDocument *document;
@@ -85,7 +86,35 @@
     
 - (UIImage *)imageWithSize:(CGSize)inSize
     {
-    return(NULL);
+    UIGraphicsBeginImageContext(inSize);
+
+    CGContextRef theContext = UIGraphicsGetCurrentContext();
+
+	CGContextSaveGState(theContext);
+
+	// First fill the background with white.
+	CGContextSetRGBFillColor(theContext, 1.0,1.0,1.0,1.0);
+    
+
+    const CGRect theMediaBox = CGPDFPageGetBoxRect(self.cg, kCGPDFMediaBox);
+    const CGRect theRenderRect = ScaleAndAlignRectToRect(theMediaBox, (CGRect){ .size = inSize }, ImageScaling_Proportionally, ImageAlignment_Center);
+
+	// Flip the context so that the PDF page is rendered right side up.
+	CGContextTranslateCTM(theContext, 0.0, inSize.height);
+	CGContextScaleCTM(theContext, 1.0, -1.0);
+	
+	// Scale the context so that the PDF page is rendered at the correct size for the zoom level.
+    CGContextTranslateCTM(theContext, -(theMediaBox.origin.x - theRenderRect.origin.x), -(theMediaBox.origin.y - theRenderRect.origin.y));
+	CGContextScaleCTM(theContext, theRenderRect.size.width / theMediaBox.size.width, theRenderRect.size.height / theMediaBox.size.height);	
+
+
+	CGContextDrawPDFPage(theContext, self.cg);
+    
+    UIImage *theImage = UIGraphicsGetImageFromCurrentImageContext();
+    
+    UIGraphicsEndImageContext();
+    
+    return(theImage);
     }
 
 - (UIImage *)thumbnail

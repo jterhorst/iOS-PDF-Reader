@@ -100,6 +100,7 @@
         theLayer.position = (CGPoint){ .x = N * (self.previewSize.width + self.previewGap), .y = 0 };
 //        theLayer.borderColor = [UIColor greenColor].CGColor;
 //        theLayer.borderWidth = 1.0;
+        theLayer.backgroundColor = [UIColor whiteColor].CGColor;
         theLayer.anchorPoint = CGPointZero;
         [theLayer setValue:[NSNumber numberWithUnsignedInteger:N] forKey:@"previewIndex"];
 
