@@ -13,8 +13,11 @@
     
 }
 
-@property (readwrite, nonatomic, retain) NSString *name;
+@property (readonly, nonatomic, retain) NSString *name;
+@property (readonly, nonatomic, copy) BOOL (^converterBlock)(id inObject, NSData **outData, NSString **outType, NSError **outError); 
+@property (readonly, nonatomic, copy) BOOL (^reverseConverterBlock)(NSData *inData, NSString *inType, id *outObject, NSError **outError); 
 
+- (BOOL)containsObjectForKey:(id)key;
 - (id)objectForKey:(id)key;
 - (void)setObject:(id)obj forKey:(id)key;
 - (void)setObject:(id)obj forKey:(id)key cost:(NSUInteger)g;
