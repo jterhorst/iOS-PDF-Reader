@@ -25,6 +25,8 @@
     {
     if ((self = [super initWithCoder:inCoder]) != NULL)
         {
+        self.contentMode = UIViewContentModeRedraw;
+        
 //		CATiledLayer *tiledLayer = (CATiledLayer *)[self layer];
 //		// levelsOfDetail and levelsOfDetailBias determine how
 //		// the layer is rendered at different zoom levels.  This
