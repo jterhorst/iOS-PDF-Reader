@@ -38,11 +38,11 @@
 	{
 	if ((self = [super initWithCoder:inDecoder]) != NULL)
 		{
-        self.scrollView = [[[UIScrollView alloc] initWithFrame:self.bounds] autorelease];
-        self.scrollView.delegate = self;
-        self.scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
+        scrollView.delegate = self;
+        scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         
-        [self addSubview:self.scrollView];
+        [self addSubview:scrollView];
 		}
 	return(self);
 	}
