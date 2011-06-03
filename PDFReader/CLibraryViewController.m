@@ -182,7 +182,8 @@
     {
     NSFileManager *theFileManager = [NSFileManager defaultManager];
 
-    NSURL *theDocumentsURL = [NSURL fileURLWithPath:[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject]];
+    
+    NSURL *theDocumentsURL = [[theFileManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
     
     NSURL *theInboxURL = [theDocumentsURL URLByAppendingPathComponent:@"Inbox"];
     NSError *theError = NULL;
