@@ -9,6 +9,7 @@
 #import "CPDFDocument.h"
 
 #import "CPDFDocument_Private.h"
+#import "CPDFPage.h"
 
 @interface CPDFDocument ()
 @property (readwrite, assign) dispatch_queue_t queue;
@@ -64,14 +65,16 @@
     return(CGPDFDocumentGetNumberOfPages(self.cg));
     }
     
-- (CPDFPage *)pageAtIndex:(NSInteger)inIndex
+- (CPDFPage *)pageForPageNumber:(NSInteger)inPageNumber
     {
-    return(NULL);
-    }
-
-- (UIImage *)previewForPageAtIndex:(NSInteger)inIndex
-    {
-    return([self.cache objectForKey:[NSNumber numberWithInteger:inIndex]]);
+    NSString *theKey = [NSString stringWithFormat:@"page_%d", inPageNumber];
+    CPDFPage *thePage = [self.cache objectForKey:theKey];
+    if (thePage == NULL)
+        {
+        thePage = [[[CPDFPage alloc] initWithDocument:self pageNumber:inPageNumber] autorelease];
+        [self.cache setObject:thePage forKey:theKey];
+        }
+    return(thePage);
     }
 
 - (void)startGeneratingThumbnails
@@ -82,60 +85,58 @@
 
     queue = dispatch_queue_create("com.example.MyQueue", NULL);
     
-    NSURL *theURL = self.URL;
-    __block CGPDFDocumentRef theDocument = NULL;
-
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^(void) {
 
-        dispatch_apply(theNumberOfPages, self.queue, ^(size_t inPageNumber) {
+        __block CGPDFDocumentRef theDocument = NULL;
 
-            inPageNumber++;
-    
-            if (theDocument == NULL)
+        dispatch_apply(theNumberOfPages, self.queue, ^(size_t inIndex) {
+
+            const size_t thePageNumber = inIndex + 1;
+            
+            if ([self.cache objectForKey:[NSNumber numberWithInteger:thePageNumber]] == NULL)
                 {
-                theDocument = CGPDFDocumentCreateWithURL((CFURLRef)theURL);
+                if (theDocument == NULL)
+                    {
+                    theDocument = CGPDFDocumentCreateWithURL((CFURLRef)self.URL);
+                    }
+                CGPDFPageRef thePage = CGPDFDocumentGetPage(theDocument, thePageNumber);
+
+                CGRect theMediaBox = CGPDFPageGetBoxRect(thePage, kCGPDFMediaBox);
+                CGFloat pdfScale = 0.125;
+                theMediaBox.size = CGSizeMake(theMediaBox.size.width*pdfScale, theMediaBox.size.height*pdfScale);
+                
+                
+                // Create a low res image representation of the PDF page to display before the TiledPDFView
+                // renders its content.
+                UIGraphicsBeginImageContext(theMediaBox.size);
+                
+                CGContextRef theContext = UIGraphicsGetCurrentContext();
+                
+                // First fill the background with white.
+                CGContextSetRGBFillColor(theContext, 1.0,1.0,1.0,1.0);
+                CGContextFillRect(theContext,theMediaBox);
+                
+                CGContextSaveGState(theContext);
+                // Flip the context so that the PDF page is rendered right side up.
+                CGContextTranslateCTM(theContext, 0.0, theMediaBox.size.height);
+                CGContextScaleCTM(theContext, 1.0, -1.0);
+                
+                // Scale the context so that the PDF page is rendered 
+                // at the correct size for the zoom level.
+                CGContextScaleCTM(theContext, pdfScale,pdfScale);	
+                CGContextDrawPDFPage(theContext, thePage);
+                CGContextRestoreGState(theContext);
+                
+                UIImage *theImage = UIGraphicsGetImageFromCurrentImageContext();
+                
+                UIGraphicsEndImageContext();
+
+                [self.cache setObject:theImage forKey:[NSNumber numberWithInteger:thePageNumber]];
                 }
-            CGPDFPageRef thePage = CGPDFDocumentGetPage(theDocument, inPageNumber);
-
-            CGRect theMediaBox = CGPDFPageGetBoxRect(thePage, kCGPDFMediaBox);
-            CGFloat pdfScale = 0.125;
-            theMediaBox.size = CGSizeMake(theMediaBox.size.width*pdfScale, theMediaBox.size.height*pdfScale);
-            
-            
-            // Create a low res image representation of the PDF page to display before the TiledPDFView
-            // renders its content.
-            UIGraphicsBeginImageContext(theMediaBox.size);
-            
-            CGContextRef theContext = UIGraphicsGetCurrentContext();
-            
-            // First fill the background with white.
-            CGContextSetRGBFillColor(theContext, 1.0,1.0,1.0,1.0);
-            CGContextFillRect(theContext,theMediaBox);
-            
-            CGContextSaveGState(theContext);
-            // Flip the context so that the PDF page is rendered right side up.
-            CGContextTranslateCTM(theContext, 0.0, theMediaBox.size.height);
-            CGContextScaleCTM(theContext, 1.0, -1.0);
-            
-            // Scale the context so that the PDF page is rendered 
-            // at the correct size for the zoom level.
-            CGContextScaleCTM(theContext, pdfScale,pdfScale);	
-            CGContextDrawPDFPage(theContext, thePage);
-            CGContextRestoreGState(theContext);
-            
-            UIImage *theImage = UIGraphicsGetImageFromCurrentImageContext();
-            
-            UIGraphicsEndImageContext();
-
-            [self.cache setObject:theImage forKey:[NSNumber numberWithInteger:inPageNumber]];
 
             dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [self.delegate PDFDocument:self didUpdateThumbnailForPageAtIndex:inPageNumber];
+                [self.delegate PDFDocument:self didUpdateThumbnailForPage:[self pageForPageNumber:thePageNumber]];
                 });
-            
-            if (theNumberOfPages == inPageNumber)
-                {
-                }
             });
         });
     }

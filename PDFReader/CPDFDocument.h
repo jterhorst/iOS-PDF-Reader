@@ -23,15 +23,13 @@
 
 - (id)initWithURL:(NSURL *)inURL;
 
-- (CPDFPage *)pageAtIndex:(NSInteger)inIndex;
-
-- (UIImage *)previewForPageAtIndex:(NSInteger)inIndex;
+- (CPDFPage *)pageForPageNumber:(NSInteger)inPageNumber;
 @end
 
 #pragma mark -
 
 @protocol CPDFDocumentDelegate <NSObject>
 
-- (void)PDFDocument:(CPDFDocument *)inDocument didUpdateThumbnailForPageAtIndex:(NSInteger)inIndex;
+- (void)PDFDocument:(CPDFDocument *)inDocument didUpdateThumbnailForPage:(CPDFPage *)inPage;
 
 @end

@@ -121,6 +121,7 @@
     
 //    [[UIApplication sharedApplication] setStatusBarHidden:![UIApplication sharedApplication].statusBarHidden withAnimation:YES];
     }
+    
 
 - (IBAction)swipe:(UISwipeGestureRecognizer *)inSender
     {
@@ -144,7 +145,7 @@
     
 - (UIImage *)previewBar:(CPreviewBar *)inPreviewBar previewAtIndex:(NSInteger)inIndex;
     {
-    UIImage *theImage = [self.document previewForPageAtIndex:inIndex + 1];
+    UIImage *theImage = [self.document pageForPageNumber:inIndex + 1].thumbnail;
     return(theImage);
     }
     
@@ -179,9 +180,9 @@
     return(thePageView);
     }
 
-- (void)PDFDocument:(CPDFDocument *)inDocument didUpdateThumbnailForPageAtIndex:(NSInteger)inIndex
+- (void)PDFDocument:(CPDFDocument *)inDocument didUpdateThumbnailForPage:(CPDFPage *)inPage
     {
-    [self.previewBar updatePreviewAtIndex:inIndex - 1];
+    [self.previewBar updatePreviewAtIndex:inPage.pageNumber - 1];
     }
 
 

@@ -88,4 +88,10 @@
     return(NULL);
     }
 
+- (UIImage *)thumbnail
+    {
+    UIImage *theImage = [self.document.cache objectForKey:[NSNumber numberWithInteger:self.pageNumber]];
+    return(theImage);
+    }
+
 @end

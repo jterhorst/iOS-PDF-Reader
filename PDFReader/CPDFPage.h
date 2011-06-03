@@ -23,4 +23,6 @@
 - (UIImage *)image;
 - (UIImage *)imageWithSize:(CGSize)inSize;
 
+- (UIImage *)thumbnail;
+
 @end
