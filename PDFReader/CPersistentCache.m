@@ -96,11 +96,13 @@
             NSURL *theDataURL = [self.URL URLByAppendingPathComponent:[theMetadata objectForKey:@"href"]];
             NSUInteger theCost = [[theMetadata objectForKey:@"cost"] unsignedIntegerValue];
             NSData *theData = [NSData dataWithContentsOfURL:theDataURL options:NSDataReadingMapped error:NULL];
-            
-            NSString *theType = [theMetadata objectForKey:@"type"];            
-            [self data:theData type:theType toObject:&theObject error:NULL];
-            
-            [self.cache setObject:theObject forKey:key cost:theCost];
+            if (theData)
+                {
+                NSString *theType = [theMetadata objectForKey:@"type"];            
+                [self data:theData type:theType toObject:&theObject error:NULL];
+                
+                [self.cache setObject:theObject forKey:key cost:theCost];
+                }
             }
         }
     

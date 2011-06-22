@@ -21,6 +21,8 @@
 @property (readonly, nonatomic, assign) NSUInteger numberOfPages;
 @property (readwrite, nonatomic, assign) id <CPDFDocumentDelegate> delegate;
 
+@property (readonly, nonatomic, retain) NSString *title;
+
 - (id)initWithURL:(NSURL *)inURL;
 
 - (CPDFPage *)pageForPageNumber:(NSInteger)inPageNumber;
