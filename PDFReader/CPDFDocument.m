@@ -11,6 +11,8 @@
 #import "CPDFDocument_Private.h"
 #import "CPDFPage.h"
 
+static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef value, void *info);
+
 @interface CPDFDocument ()
 @property (readwrite, assign) dispatch_queue_t queue;
 
@@ -64,7 +66,23 @@
     {
     return(CGPDFDocumentGetNumberOfPages(self.cg));
     }
+
+- (NSString *)title
+    {
     
+    CGPDFDictionaryRef theInfo = CGPDFDocumentGetInfo(self.cg);
+
+    CGPDFStringRef thePDFTitle = NULL;
+    CGPDFDictionaryGetString(theInfo, "Title", &thePDFTitle);
+//    kCGPDF
+    
+    NSString *theTitle = [(NSString *)CGPDFStringCopyTextString(thePDFTitle) autorelease];
+    
+    return(theTitle);
+    }
+
+#pragma mark -
+
 - (CPDFPage *)pageForPageNumber:(NSInteger)inPageNumber
     {
     NSString *theKey = [NSString stringWithFormat:@"page_%d", inPageNumber];
@@ -112,3 +130,8 @@
 
 
 @end
+
+static void MyCGPDFDictionaryApplierFunction(const char *key, CGPDFObjectRef value, void *info)
+    {
+    NSLog(@"%s", key);
+    }
